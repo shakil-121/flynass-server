@@ -5,6 +5,7 @@ const cors = require("cors");
 require("dotenv").config();
 const jwt = require('jsonwebtoken');
 
+
 // Midelware  
 app.use(cors());
 app.use(express.json()); 
@@ -27,7 +28,40 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     
+    const usersCollection=client.db("flynass").collection("users")
+    const orderCollection=client.db("flynass").collection("orders")
 
+    // jwt token create 
+    app.post("/jwt",(req,res)=>{
+      const user=req.body;
+      const token=jwt.sign(user,process.env.Access_token,{expiresIn:"1h"}) 
+      res.send({token})
+    })
+
+    app.post("/users",async(req,res)=>{
+    users=req.body; 
+      console.log(users);
+      const query={email:users.email}; 
+      const existingusers=await usersCollection.findOne(query)
+      if(existingusers)
+      {
+        return res.send({message:'Merchant already exists'})
+      }
+      const result=await merchantCollection.insertOne(users);
+      res.send(result)
+    })
+
+
+    app.post("/orders",async(req,res)=>{
+     const order=req.body;
+     const result=await orderCollection.insertOne(order);
+     res.send(result)
+    })
+
+    app.get("/orders",async(req,res)=>{
+      const result=await orderCollection.find().toArray();
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
