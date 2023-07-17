@@ -10,6 +10,25 @@ const jwt = require('jsonwebtoken');
 app.use(cors());
 app.use(express.json()); 
 
+const verifyJWT = (req, res, next) => {
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({ error: true, message: 'unauthorized access' });
+  }
+  // bearer token
+  const token = authorization.split(' ')[1];
+
+  jwt.verify(token, process.env.Access_token, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ error: true, message: 'unauthorized access' })
+    }
+    req.decoded = decoded;
+    next();
+  })
+}
+ 
+
+
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ts9e2p2.mongodb.net/?retryWrites=true&w=majority`;
@@ -47,10 +66,16 @@ async function run() {
       {
         return res.send({message:'Merchant already exists'})
       }
-      const result=await merchantCollection.insertOne(users);
+      const result=await usersCollection.insertOne(users);
+      res.send(result)
+    }) 
+
+    app.get("/user/:email",async(req,res)=>{
+      const email=req.params.email;
+
+      const result=await usersCollection.findOne({email:email});
       res.send(result)
     })
-
 
     app.post("/orders",async(req,res)=>{
      const order=req.body;
