@@ -78,19 +78,7 @@ async function run() {
       {
         return res.send({message:'Merchant already exists'})
       }
-      const result=await usersCollection.insertOne(users);
-      res.send(result)
-    }) 
-
-    app.get("/user/:email",async(req,res)=>{
-      const email=req.params.email;
-
-      const result=await usersCollection.findOne({email:email});
-      res.send(result)
-    }) 
-
-    app.get("/users",async(req,res)=>{
-      const result =await usersCollection.find().toArray()
+      const result=await merchantCollection.insertOne(users);
       res.send(result)
     })
 
@@ -163,5 +151,5 @@ app.get("/",(req,res)=>{
 });
 
 app.listen(port,()=>{
-    console.log(`Flynass server is running on ${port}`);
+    console.log(`Flynass server is running on ${port}`);
 });
