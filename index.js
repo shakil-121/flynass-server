@@ -66,7 +66,19 @@ async function run() {
       {
         return res.send({message:'Merchant already exists'})
       }
-      const result=await merchantCollection.insertOne(users);
+      const result=await usersCollection.insertOne(users);
+      res.send(result)
+    }) 
+
+    app.get("/user/:email",async(req,res)=>{
+      const email=req.params.email;
+
+      const result=await usersCollection.findOne({email:email});
+      res.send(result)
+    }) 
+
+    app.get("/users",async(req,res)=>{
+      const result =await usersCollection.find().toArray()
       res.send(result)
     })
 
