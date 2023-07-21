@@ -78,7 +78,7 @@ async function run() {
       {
         return res.send({message:'Merchant already exists'})
       }
-      const result=await merchantCollection.insertOne(users);
+      const result=await usersCollection.insertOne(users);
       res.send(result)
     })
 
@@ -161,7 +161,7 @@ async function run() {
     const result={admin:user?.role==="merchant"}
     res.send(result);
   });
-  
+
   app.get("/user/admin/:email",async(req,res)=>{
     const email=req.params.email;
     const quary={email:email};
