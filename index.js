@@ -5,6 +5,18 @@ const cors = require("cors");
 require("dotenv").config();
 const jwt = require('jsonwebtoken');
 
+// for csv file upload  
+const multer = require('multer');
+const csvParser = require('csv-parser');
+const fs = require('fs');
+
+const uploadDir = './uploads';
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
+
 
 // Midelware  
 app.use(cors());
@@ -82,6 +94,14 @@ async function run() {
       res.send(result)
     })
 
+    app.get("/user/:email",async(req,res)=>{
+      const email=req.params.email;
+      const quary={email:email};
+
+      const result=await usersCollection.findOne(quary);
+      res.send(result)
+    })
+
     app.post("/orders",async(req,res)=>{
      const order=req.body;
      const result=await orderCollection.insertOne(order);
@@ -91,8 +111,70 @@ async function run() {
     app.get("/orders",async(req,res)=>{
       const result=await orderCollection.find().toArray();
       res.send(result)
-    })
+    }) 
 
+
+    // for csv file upload  
+         // File upload configuration
+  const upload = multer({ dest: "uploads/" });
+
+  // File upload endpoint
+  app.post("/upload", upload.single("csvFile"), (req, res) => {
+    const file = req.file;
+    console.log(file);
+    const user_email = req.body.user_email;
+    if (!file) {
+      return res.status(400).json({ error: "No CSV file uploaded" });
+    }
+
+    const results = [];
+
+    // Parse CSV file and save data to MongoDB
+    fs.createReadStream(file.path)
+      .pipe(csvParser())
+      .on("data", (row) => {
+        // Assuming the CSV has columns 'name', 'age', 'email'
+        // Adjust this according to your actual CSV structure
+        results.push({
+        referenceNumber: row.ID,
+        name: row.NAME,
+        user_email: user_email,
+        });
+      })
+      .on("end", () => {
+        // Save the data to MongoDB
+        orderCollection.insertMany(results, (err, result) => {
+          if (err) {
+            res.status(500).json({ error: "Error saving data to MongoDB" });
+          } else {
+           const result= res.status(200).json({ message: "Data saved to MongoDB successfully" });
+            console.log(result);
+          }
+        });
+      });
+  });
+
+
+  // admin and superAdmin finding ============================
+  app.get("/user/admin/:email",async(req,res)=>{
+    const email=req.params.email;
+    const quary={email:email};
+
+    const user=await usersCollection.findOne(quary);
+    const result={admin:user?.role==="admin"}
+    res.send(result);
+  })
+
+
+  app.get("/user/superadmin/:email",async(req,res)=>{
+    const email=req.params.email;
+    const quary={email:email};
+
+    const user=await usersCollection.findOne(quary);
+    const result={super_admin:user?.role==="superAdmin"}
+    res.send(result);
+  })
+// ===============================================================
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
