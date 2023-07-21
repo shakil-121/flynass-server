@@ -161,23 +161,8 @@ async function run() {
     const user=await usersCollection.findOne(quary);
     const result={super_admin:user?.role==="superAdmin"}
     res.send(result);
-  });
+  })
 // ===============================================================
-// filter by date 
-app.get("/orders/today", async (req, res) => {
-  const today = new Date();
-  const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-console.log(formattedToday);
-  const query = { date: formattedToday }; // Assuming the date field is named 'date'
-  
-  try {
-    const result = await orderCollection.find(query).toArray();
-    res.send(result);
-  } catch (error) {
-    console.error("Error fetching orders for today:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
