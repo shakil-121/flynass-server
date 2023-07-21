@@ -124,8 +124,17 @@ async function run() {
         // Assuming the CSV has columns 'name', 'age', 'email'
         // Adjust this according to your actual CSV structure
         results.push({
-        referenceNumber: row.ID,
-        name: row.NAME,
+        marchent_id: row.marchent_id,
+        name: row.name,
+        phone:row.phone,
+        from_address:row.from_address,
+        to_address:row.to_address,
+        district:row.district,
+        thana:row.thana,
+        product_amount:row.product_amount,
+        delivary_Charge:row.delivary_Charge,
+        cod:row.cod,
+        total_amount:row.total_amount,
         user_email: user_email,
         });
       })
@@ -144,6 +153,15 @@ async function run() {
 
 
   // admin and superAdmin finding ============================
+  app.get("/user/merchant/:email",async(req,res)=>{
+    const email=req.params.email;
+    const quary={email:email};
+
+    const user=await usersCollection.findOne(quary);
+    const result={admin:user?.role==="merchant"}
+    res.send(result);
+  });
+  
   app.get("/user/admin/:email",async(req,res)=>{
     const email=req.params.email;
     const quary={email:email};
@@ -163,7 +181,7 @@ async function run() {
     res.send(result);
   });
 
-  
+
 // filter by date 
 app.get("/orders/today", async (req, res) => {
   const today = new Date();
