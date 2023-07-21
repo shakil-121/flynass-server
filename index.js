@@ -111,6 +111,7 @@ async function run() {
     const file = req.file;
     console.log(file);
     const user_email = req.body.user_email;
+    const status='pending'
     if (!file) {
       return res.status(400).json({ error: "No CSV file uploaded" });
     }
@@ -136,6 +137,7 @@ async function run() {
         cod:row.cod,
         total_amount:row.total_amount,
         user_email: user_email,
+        status:status,
         });
       })
       .on("end", () => {
