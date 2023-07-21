@@ -82,6 +82,14 @@ async function run() {
       res.send(result)
     })
 
+    app.get("/user/:email",async(req,res)=>{
+      const email=req.params.email;
+      const quary={email:email};
+
+      const result=await usersCollection.findOne(quary);
+      res.send(result)
+    })
+
     app.post("/orders",async(req,res)=>{
      const order=req.body;
      const result=await orderCollection.insertOne(order);
@@ -135,6 +143,26 @@ async function run() {
   });
 
 
+  // admin and superAdmin finding ============================
+  app.get("/user/admin/:email",async(req,res)=>{
+    const email=req.params.email;
+    const quary={email:email};
+
+    const user=await usersCollection.findOne(quary);
+    const result={admin:user?.role==="admin"}
+    res.send(result);
+  })
+
+
+  app.get("/user/superadmin/:email",async(req,res)=>{
+    const email=req.params.email;
+    const quary={email:email};
+
+    const user=await usersCollection.findOne(quary);
+    const result={super_admin:user?.role==="superAdmin"}
+    res.send(result);
+  })
+// ===============================================================
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
