@@ -77,15 +77,53 @@ async function run() {
       if (existingusers) {
         return res.send({ message: 'Merchant already exists' })
       }
-      const result = await merchantCollection.insertOne(users);
+      const result = await usersCollection.insertOne(users);
       res.send(result)
     })
+
+    app.patch('/users/admin/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          role: 'admin'
+        },
+      };
+
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+
+    })
+
+    app.put('/user/:id', async (req, res) => {
+      const id = req.params.id;
+      const user = req.body;
+      console.log(user);
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateProfile = {
+        $set: {
+          name: user.name,
+          phone: user.phone,
+          address: user.address
+        }
+      }
+      const result = await usersCollection.updateOne(filter, updateProfile, options);
+      res.send(result)
+    });
+
 
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
       const quary = { email: email };
 
       const result = await usersCollection.findOne(quary);
+      res.send(result)
+    })
+
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find().toArray();
       res.send(result)
     })
 
@@ -99,32 +137,10 @@ async function run() {
       const result = await orderCollection.find().toArray();
       res.send(result)
     })
-
-    app.get("/users", async (req, res) => {
-      const result = await usersCollection.find().toArray();
-      res.send(result)
-    })
-
-    app.patch('/user/status/:id', async (req, res) => {
+    app.put("/orders/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          role: 'admin'
-        },
-      };
-
-      const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send(result);
-    })
-
-    app.delete("/users/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) }
-
-      const result = await usersCollection.deleteOne(query);
-      res.send(result);
+      const updatInfo = req.body;
+      console.log(updatInfo);
     })
 
 
@@ -137,6 +153,7 @@ async function run() {
       const file = req.file;
       console.log(file);
       const user_email = req.body.user_email;
+      const status = 'pending'
       if (!file) {
         return res.status(400).json({ error: "No CSV file uploaded" });
       }
@@ -150,9 +167,19 @@ async function run() {
           // Assuming the CSV has columns 'name', 'age', 'email'
           // Adjust this according to your actual CSV structure
           results.push({
-            referenceNumber: row.ID,
-            name: row.NAME,
+            marchent_id: row.marchent_id,
+            name: row.name,
+            phone: row.phone,
+            from_address: row.from_address,
+            to_address: row.to_address,
+            district: row.district,
+            thana: row.thana,
+            product_amount: row.product_amount,
+            delivary_Charge: row.delivary_Charge,
+            cod: row.cod,
+            total_amount: row.total_amount,
             user_email: user_email,
+            status: status,
           });
         })
         .on("end", () => {
@@ -170,6 +197,15 @@ async function run() {
 
 
     // admin and superAdmin finding ============================
+    app.get("/user/merchant/:email", async (req, res) => {
+      const email = req.params.email;
+      const quary = { email: email };
+
+      const user = await usersCollection.findOne(quary);
+      const result = { admin: user?.role === "merchant" }
+      res.send(result);
+    });
+
     app.get("/user/admin/:email", async (req, res) => {
       const email = req.params.email;
       const quary = { email: email };
@@ -187,8 +223,24 @@ async function run() {
       const user = await usersCollection.findOne(quary);
       const result = { super_admin: user?.role === "superAdmin" }
       res.send(result);
-    })
-    // ===============================================================
+    });
+
+
+    // filter by date 
+    app.get("/orders/today", async (req, res) => {
+      const today = new Date();
+      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+      console.log(formattedToday);
+      const query = { date: formattedToday }; // Assuming the date field is named 'date'
+
+      try {
+        const result = await orderCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching orders for today:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
