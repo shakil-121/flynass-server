@@ -409,6 +409,19 @@ app.delete("/order/:id",async(req,res)=>{
           });
         });
         res.send(results)
+    }); 
+  
+    // delete multipul order by filtering status
+    app.delete("/delete", async (req, res) => {
+      const query = { status: { $in: ["delivered", "rejected"] } };
+    
+      try {
+        const result = await orderCollection.deleteMany(query);
+        res.send(result);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('An error occurred while deleting orders.');
+      }
     });
 
     // admin and superAdmin finding ============================
