@@ -113,7 +113,7 @@ async function run() {
       };
       const result = await usersCollection.updateOne(filter, updateProfile);
       res.send(result);
-    }); 
+    });
 
     // user role update 
     app.put("/user/role_update/:id", async (req, res) => {
@@ -130,9 +130,9 @@ async function run() {
       };
       const result = await usersCollection.updateOne(filter, updateProfile);
       res.send(result);
-    }); 
+    });
 
-   
+
 
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
@@ -150,7 +150,7 @@ async function run() {
     app.post("/orders", async (req, res) => {
       const order = req.body;
 
-       // Add the createdAt field with the current date to the order
+      // Add the createdAt field with the current date to the order
       //  order.createdAt = new Date();
 
       const result = await orderCollection.insertOne(order);
@@ -161,29 +161,29 @@ async function run() {
     });
 
 
-      //  // Function to schedule the deletion of the order after one month
-      //  function scheduleOrderDeletion(orderId) {
-      //    const oneMonthInMilliseconds = 31 * 24 * 60 * 60 * 1000; // One month in milliseconds
-      //   setTimeout(async () => {
-      //     try {
-      //       const query = { _id: new ObjectId(orderId) };
-      //       const result = await orderCollection.deleteOne(query);
-      //       console.log("Deleted order:", result.deletedCount);
-      //     } catch (error) {
-      //       console.error("Error deleting order:", error);
-      //     }
-      //   }, oneMonthInMilliseconds);
-      // }
+    //  // Function to schedule the deletion of the order after one month
+    //  function scheduleOrderDeletion(orderId) {
+    //    const oneMonthInMilliseconds = 31 * 24 * 60 * 60 * 1000; // One month in milliseconds
+    //   setTimeout(async () => {
+    //     try {
+    //       const query = { _id: new ObjectId(orderId) };
+    //       const result = await orderCollection.deleteOne(query);
+    //       console.log("Deleted order:", result.deletedCount);
+    //     } catch (error) {
+    //       console.error("Error deleting order:", error);
+    //     }
+    //   }, oneMonthInMilliseconds);
+    // }
 
     app.get("/orders", async (req, res) => {
       const result = await orderCollection.find().toArray();
       res.send(result);
     });
 
-    app.get("/user/order/:email",async(req,res)=>{
-      const email=req.params.email;
-      const quary ={user_email:email}
-      const result=await orderCollection.find(quary).toArray();
+    app.get("/user/order/:email", async (req, res) => {
+      const email = req.params.email;
+      const quary = { user_email: email }
+      const result = await orderCollection.find(quary).toArray();
       res.send(result)
     })
 
@@ -212,16 +212,16 @@ async function run() {
       };
       const result = await orderCollection.updateOne(filter, updateProfile);
       res.send(result);
-    }); 
+    });
 
     // delete single order 
-app.delete("/order/:id",async(req,res)=>{
-  const id=req.params.id; 
-  const quary={_id:new ObjectId(id)}; 
+    app.delete("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const quary = { _id: new ObjectId(id) };
 
-  const result=await orderCollection.deleteOne(quary);
-  res.send(result)
-})
+      const result = await orderCollection.deleteOne(quary);
+      res.send(result)
+    })
 
     app.put("/order/status/:id", async (req, res) => {
       const id = req.params.id;
@@ -232,31 +232,31 @@ app.delete("/order/:id",async(req,res)=>{
       // const options = { upsert: true };
       const updateProfile = {
         $set: {
-          status:updateInfo.status,
+          status: updateInfo.status,
         },
       };
       const result = await orderCollection.updateOne(filter, updateProfile);
       res.send(result);
-    }); 
+    });
 
     // update many ID data 
     // app.put("/order/status", async (req, res) => {
     //   const { ids, status } = req.body;
-    
+
     //   if (!Array.isArray(ids) || ids.length === 0) {
     //     return res.status(400).json({ error: "Invalid parcel IDs provided." });
     //   }
-    
+
     //   // Convert the array of IDs to an array of ObjectIds
     //   const objectIds = ids.map((id) => new ObjectId(id));
-    
+
     //   const filter = { _id: { $in: objectIds } };
     //   const updateProfile = {
     //     $set: {
     //       status: status,
     //     },
     //   };
-    
+
     //   try {
     //     const result = await orderCollection.updateMany(filter, updateProfile);
     //     res.json({ acknowledged: result.acknowledged, modifiedCount: result.modifiedCount });
@@ -265,36 +265,31 @@ app.delete("/order/:id",async(req,res)=>{
     //     res.status(500).json({ error: "Failed to update parcels." });
     //   }
     // });
-    
-    app.put("/order/status", async (req, res) => {
+
+    app.patch("/order/multi-status", async (req, res) => {
       const { ids, status } = req.body;
-    
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ error: "Invalid parcel IDs provided." });
-      }
-    
-      // Convert the status to lowercase (optional, for consistency)
-      const lowercaseStatus = status.toLowerCase();
-    
+
       const objectIds = ids.map((id) => new ObjectId(id));
+
       const filter = { _id: { $in: objectIds } };
-      const updateProfile = {
+      const updateStatus = {
         $set: {
-          status: lowercaseStatus,
+          status: status,
         },
       };
-    
+
+
       try {
-        const result = await orderCollection.updateMany(filter, updateProfile);
-        res.json({ acknowledged: result.acknowledged, modifiedCount: result.modifiedCount });
+        const result = await orderCollection.updateMany(filter, updateStatus, { multi: true });
+        console.log(result); // Log the result for debugging
+        res.send(result);
       } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Failed to update parcels." });
+        res.status(500).json({ error: "Failed to update orders." });
       }
     });
-    
-    
-    
+
+
 
     app.put("/order/payment/:id", async (req, res) => {
       const id = req.params.id;
@@ -305,12 +300,12 @@ app.delete("/order/:id",async(req,res)=>{
       // const options = { upsert: true };
       const updatePaymentStatus = {
         $set: {
-          payment_status:"paid",
+          payment_status: "paid",
         },
       };
       const result = await orderCollection.updateOne(filter, updatePaymentStatus);
       res.send(result);
-    }); 
+    });
 
     // search 
     // app.get("/orders/:text", async (req, res) => {
@@ -326,27 +321,27 @@ app.delete("/order/:id",async(req,res)=>{
     //   res.send(result);
     // }) 
     app.get("/orders/:text", async (req, res) => {
-  const text = req.params.text;
-  let query = {};
+      const text = req.params.text;
+      let query = {};
 
-  // Check if the input text can be converted to ObjectId
-  if (ObjectId.isValid(text)) {
-    query = { _id:new ObjectId(text) };
-  } else {
-    query = {
-      $or: [
-        { _id: { $regex: text, $options: "i" } },
-        { phone: { $regex: text, $options: "i" } },
-        { name: { $regex: text, $options: "i" } },
-        { trackingId: { $regex: text, $options: "i" } },
-        { user_email: { $regex: text, $options: "i" } },
-      ],
-    };
-  }
+      // Check if the input text can be converted to ObjectId
+      if (ObjectId.isValid(text)) {
+        query = { _id: new ObjectId(text) };
+      } else {
+        query = {
+          $or: [
+            { _id: { $regex: text, $options: "i" } },
+            { phone: { $regex: text, $options: "i" } },
+            { name: { $regex: text, $options: "i" } },
+            { trackingId: { $regex: text, $options: "i" } },
+            { user_email: { $regex: text, $options: "i" } },
+          ],
+        };
+      }
 
-  const result = await orderCollection.find(query).toArray();
-  res.send(result);
-});
+      const result = await orderCollection.find(query).toArray();
+      res.send(result);
+    });
 
 
     // for csv file upload
@@ -359,9 +354,9 @@ app.delete("/order/:id",async(req,res)=>{
       console.log(file);
       const user_email = req.body.user_email;
       const id = req.body.marchent_id;
-      const TrackingID=req.body.trackingId;
-      const fromAddress=req.body.from_address; 
-      const date=req.body.date;
+      const TrackingID = req.body.trackingId;
+      const fromAddress = req.body.from_address;
+      const date = req.body.date;
       const status = "pending";
       if (!file) {
         return res.status(400).json({ error: "No CSV file uploaded" });
@@ -376,11 +371,11 @@ app.delete("/order/:id",async(req,res)=>{
           // Assuming the CSV has columns 'name', 'age', 'email'
           // Adjust this according to your actual CSV structure
           results.push({
-            marchent_id:id,
+            marchent_id: id,
             name: row["Marchent name"],
             customer_phone: row["Coustomer phone number"],
             customer_name: row["Customer name"],
-            from_address:fromAddress,
+            from_address: fromAddress,
             to_address: row["Customer Adress"],
             district: row["District Name"],
             thana: row["Thana Name"],
@@ -388,11 +383,11 @@ app.delete("/order/:id",async(req,res)=>{
             delivary_Charge: row.delivary_Charge,
             cod: row.cod,
             total_amount: row.total_amount,
-            special_instruction:row["Special instruction"],
+            special_instruction: row["Special instruction"],
             user_email: user_email,
             status: status,
-            date:date,
-            trackingId:TrackingID,
+            date: date,
+            trackingId: TrackingID,
           });
         })
         .on("end", () => {
@@ -408,7 +403,7 @@ app.delete("/order/:id",async(req,res)=>{
             }
           });
         });
-        res.send(results)
+      res.send(results)
     });
 
     // admin and superAdmin finding ============================
@@ -457,10 +452,10 @@ app.delete("/order/:id",async(req,res)=>{
     // }); 
 
     app.get("/orders/today", async (req, res) => {
-      const today = new Date(); 
+      const today = new Date();
       const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
       const query = { date: formattedToday }; // Assuming the date field is named 'date'
-    
+
       console.log("Query:", query); // Add this line for debugging
 
       try {
@@ -471,7 +466,7 @@ app.delete("/order/:id",async(req,res)=>{
         res.status(500).json({ error: "Internal Server Error" });
       }
     });
-    
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
