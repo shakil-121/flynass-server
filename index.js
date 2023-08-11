@@ -476,7 +476,8 @@ async function run() {
             total_amount: row.total_amount,
             special_instruction: row["Special instruction"],
             user_email: user_email,
-            status: status,
+            status: status, 
+            payment_status: "due",
             date: date,
             trackingId: trackingId, // Use the generated tracking ID
           });
