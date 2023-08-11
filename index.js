@@ -95,14 +95,14 @@ async function run() {
 
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result);
-    }); 
-    
-    // single user delete API 
-    app.delete("/users/:id", async(req,res)=>{
-      const id=req.params.id;
+    });
 
-      const quary={_id:new ObjectId(id)}
-      const result=await usersCollection.deleteOne(quary);
+    // single user delete API 
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const quary = { _id: new ObjectId(id) }
+      const result = await usersCollection.deleteOne(quary);
       res.send(result)
     })
 
@@ -345,6 +345,7 @@ async function run() {
             { name: { $regex: text, $options: "i" } },
             { trackingId: { $regex: text, $options: "i" } },
             { user_email: { $regex: text, $options: "i" } },
+            { date: { $regex: text, $options: "i" } },
           ],
         };
       }
@@ -413,13 +414,13 @@ async function run() {
             }
           });
         });
-        res.send(results)
-    }); 
-  
+      res.send(results)
+    });
+
     // delete multipul order by filtering status
     app.delete("/delete", async (req, res) => {
-      const query = { status: { $in: ["delivered", "rejected","returned to merchant"] } };
-    
+      const query = { status: { $in: ["delivered", "rejected", "returned to merchant"] } };
+
       try {
         const result = await orderCollection.deleteMany(query);
         res.send(result);
@@ -476,7 +477,7 @@ async function run() {
 
     app.get("/orders/today", async (req, res) => {
       const today = new Date();
-      const formattedToday = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
+      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
       const query = { date: formattedToday }; // Assuming the date field is named 'date'
 
       console.log("Query:", query); // Add this line for debugging
