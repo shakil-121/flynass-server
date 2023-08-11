@@ -345,7 +345,6 @@ async function run() {
             { name: { $regex: text, $options: "i" } },
             { trackingId: { $regex: text, $options: "i" } },
             { user_email: { $regex: text, $options: "i" } },
-            { date: { $regex: text, $options: "i" } },
           ],
         };
       }
@@ -360,69 +359,110 @@ async function run() {
     const upload = multer({ dest: "uploads/" });
 
     // File upload endpoint
+    // app.post("/upload", upload.single("csvFile"), (req, res) => {
+    //   const file = req.file;
+    //   console.log(file.originalname);
+    //   console.log(file);
+    //   const user_email = req.body.user_email;
+    //   const id = req.body.marchent_id;
+    //   // const TrackingID = req.body.trackingId;
+    //   const fromAddress = req.body.from_address;
+    //   const date = req.body.date;
+    //   const status = "pending";
+    //   if (!file) {
+    //     return res.status(400).json({ error: "No CSV file uploaded" });
+    //   }
+
+    //   const results = [];
+
+    //   // Parse CSV file and save data to MongoDB
+    //   fs.createReadStream(file.path)
+    //     .pipe(csvParser())
+    //     .on("data", (row) => {
+    //       // Assuming the CSV has columns 'name', 'age', 'email'
+    //       // Adjust this according to your actual CSV structure
+    //       const currentDate = new Date();
+    //       const formattedDay = String(currentDate.getDate()).padStart(2, "0");
+    //       const formattedMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
+    //       const year = currentDate.getFullYear();
+    //       const dateString = `${formattedDay}${formattedMonth}${year}`;
+    //       const trackingId = `${dateString}-${trackingIdCounter.toString().padStart(4, "0")}`;
+    //       trackingIdCounter++;
+    //       results.push({
+    //         marchent_id: id,
+    //         name: row["Marchent name"],
+    //         customer_phone: row["Coustomer phone number"],
+    //         customer_name: row["Customer name"],
+    //         from_address: fromAddress,
+    //         to_address: row["Customer Adress"],
+    //         district: row["District Name"],
+    //         thana: row["Thana Name"],
+    //         product_amount: row["Actual Price"],
+    //         delivary_Charge: row.delivary_Charge,
+    //         cod: row.cod,
+    //         total_amount: row.total_amount,
+    //         special_instruction: row["Special instruction"],
+    //         user_email: user_email,
+    //         status: status,
+    //         date: date,
+    //         trackingId: trackingId,
+    //       });
+    //     })
+    //     .on("end", () => {
+    //       // Save the data to MongoDB
+    //       orderCollection.insertMany(results, (err, result) => {
+    //         if (err) {
+    //           res.status(500).json({ error: "Error saving data to MongoDB" });
+    //         } else {
+    //           const result = res
+    //             .status(200)
+    //             .json({ message: "Data saved to MongoDB successfully" });
+    //           console.log(result);
+    //         }
+    //       });
+    //     });
+    //   res.send(results)
+    // });
+
+    // Import necessary modules and set up your app, middleware, etc.
+
+    // File upload endpoint
     app.post("/upload", upload.single("csvFile"), (req, res) => {
       const file = req.file;
-      console.log(file);
+      console.log(file.originalname);
+      const TrackingID = req.body.trackingId;
       const user_email = req.body.user_email;
       const id = req.body.marchent_id;
-      // const TrackingID = req.body.trackingId;
       const fromAddress = req.body.from_address;
       const date = req.body.date;
       const status = "pending";
-     
-      // tracking id genarate==============================  
-      const currentDate = new Date();
-      const day = currentDate.getDate();
-      const month = currentDate.getMonth() + 1; // Add 1 to get the actual month (January is 0)
-      const year = currentDate.getFullYear(); 
-    
-       const previousLength = req.body.previousLength;
-       const newLength = previousLength + 1;
-       const onDigitmiddlePart = newLength.toString();
-       const fourDigitMiddle = onDigitmiddlePart.padStart(4, "0");
-       // console.log(fourDigitMiddle);
-       // const dateString = (`${day}${month}${year}` - "0001" - "FN-HF")
-       const formattedDay = String(day).padStart(2, "0");
-       const formattedMonth = String(month).padStart(2, "0");
-       const formatDate = `${formattedDay}${formattedMonth}${year}`;
-       const stringDate = formatDate.toString();
-       // console.log(`Current date: ${formattedDay}${formattedMonth}${year}`);
-       const lastDigit = "FN";
-       const TrackingID = `${stringDate}-${fourDigitMiddle}-${lastDigit}`;
-
-      // ===================================================
-
 
       if (!file) {
         return res.status(400).json({ error: "No CSV file uploaded" });
       }
 
       const results = [];
+      let trackingIdCounter = 1; // Initialize the tracking ID counter
 
       // Parse CSV file and save data to MongoDB
       fs.createReadStream(file.path)
         .pipe(csvParser())
         .on("data", (row) => {
+          // Generate a new tracking ID for each order
+          const currentDate = new Date();
+          const formattedDay = String(currentDate.getDate()).padStart(2, "0");
+          const formattedMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
+          const year = currentDate.getFullYear();
+          const dateString = `${formattedDay}${formattedMonth}${year}`;
+          const trackingId = `${dateString}-${trackingIdCounter.toString().padStart(4, "0")}`;
+          trackingIdCounter++;
+
           // Assuming the CSV has columns 'name', 'age', 'email'
           // Adjust this according to your actual CSV structure
           results.push({
             marchent_id: id,
-            name: row["Marchent name"],
-            customer_phone: row["Coustomer phone number"],
-            customer_name: row["Customer name"],
-            from_address: fromAddress,
-            to_address: row["Customer Adress"],
-            district: row["District Name"],
-            thana: row["Thana Name"],
-            product_amount: row["Actual Price"],
-            delivary_Charge: row.delivary_Charge,
-            cod: row.cod,
-            total_amount: row.total_amount,
-            special_instruction: row["Special instruction"],
-            user_email: user_email,
-            status: status,
-            date: date,
-            trackingId: TrackingID,
+            // ... Other fields ...
+            trackingId: trackingId, // Use the generated tracking ID
           });
         })
         .on("end", () => {
@@ -431,15 +471,15 @@ async function run() {
             if (err) {
               res.status(500).json({ error: "Error saving data to MongoDB" });
             } else {
-              const result = res
-                .status(200)
-                .json({ message: "Data saved to MongoDB successfully" });
-              console.log(result);
+              res.status(200).json({ message: "Data saved to MongoDB successfully" });
             }
           });
         });
       res.send(results)
     });
+
+    // Start your server and listen on a port
+
 
     // delete multipul order by filtering status
     app.delete("/delete", async (req, res) => {
