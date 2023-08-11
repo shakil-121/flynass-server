@@ -345,6 +345,7 @@ async function run() {
             { name: { $regex: text, $options: "i" } },
             { trackingId: { $regex: text, $options: "i" } },
             { user_email: { $regex: text, $options: "i" } },
+            { status: { $regex: text, $options: "i" } },
           ],
         };
       }
