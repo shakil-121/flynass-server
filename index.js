@@ -337,9 +337,7 @@ async function run() {
       // Check if the input text can be converted to ObjectId
       if (ObjectId.isValid(text)) {
         query = { _id: new ObjectId(text) };
-      } else { 
-        const searchDate = moment(text, "DD/MM/YYYY").toDate();
-        const nextDay = moment(searchDate).add(1, "day").toDate();
+      } else {
         query = {
           $or: [
             { _id: { $regex: text, $options: "i" } },
@@ -347,7 +345,6 @@ async function run() {
             { name: { $regex: text, $options: "i" } },
             { trackingId: { $regex: text, $options: "i" } },
             { user_email: { $regex: text, $options: "i" } },
-            { date: { $regex: text, $options: "i" } },
           ],
         };
       }
@@ -438,36 +435,15 @@ async function run() {
       const fromAddress = req.body.from_address;
       const date = req.body.date;
       const status = "pending";
-     
-      // tracking id genarate==============================  
-      const currentDate = new Date();
-      const day = currentDate.getDate();
-      const month = currentDate.getMonth() + 1; // Add 1 to get the actual month (January is 0)
-      const year = currentDate.getFullYear(); 
-    
-       const previousLength = req.body.previousLength;
-       const newLength = previousLength + 1;
-       const onDigitmiddlePart = newLength.toString();
-       const fourDigitMiddle = onDigitmiddlePart.padStart(4, "0");
-       // console.log(fourDigitMiddle);
-       // const dateString = (`${day}${month}${year}` - "0001" - "FN-HF")
-       const formattedDay = String(day).padStart(2, "0");
-       const formattedMonth = String(month).padStart(2, "0");
-       const formatDate = `${formattedDay}${formattedMonth}${year}`;
-       const stringDate = formatDate.toString();
-       // console.log(`Current date: ${formattedDay}${formattedMonth}${year}`);
-       const lastDigit = "FN";
-       const TrackingID = `${stringDate}-${fourDigitMiddle}-${lastDigit}`;
 
-      // ===================================================
-
+      const previousLength = req.body.previousLength;
 
       if (!file) {
         return res.status(400).json({ error: "No CSV file uploaded" });
       }
 
       const results = [];
-      let trackingIdCounter = 1; // Initialize the tracking ID counter
+      let trackingIdCounter = previousLength; // Initialize the tracking ID counter
 
       // Parse CSV file and save data to MongoDB
       fs.createReadStream(file.path)
@@ -479,14 +455,29 @@ async function run() {
           const formattedMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
           const year = currentDate.getFullYear();
           const dateString = `${formattedDay}${formattedMonth}${year}`;
-          const trackingId = `${dateString}-${trackingIdCounter.toString().padStart(4, "0")}`;
+          const lastDigit = "FN";
+          const trackingId = `${dateString}-${trackingIdCounter.toString().padStart(4, "0")}-${lastDigit}`;
           trackingIdCounter++;
 
           // Assuming the CSV has columns 'name', 'age', 'email'
           // Adjust this according to your actual CSV structure
           results.push({
             marchent_id: id,
-            // ... Other fields ...
+            name: row["Marchent name"],
+            customer_phone: row["Coustomer phone number"],
+            customer_name: row["Customer name"],
+            from_address: fromAddress,
+            to_address: row["Customer Adress"],
+            district: row["District Name"],
+            thana: row["Thana Name"],
+            product_amount: row["Actual Price"],
+            delivary_Charge: row.delivary_Charge,
+            cod: row.cod,
+            total_amount: row.total_amount,
+            special_instruction: row["Special instruction"],
+            user_email: user_email,
+            status: status,
+            date: date,
             trackingId: trackingId, // Use the generated tracking ID
           });
         })
@@ -550,7 +541,7 @@ async function run() {
     // filter by date
     app.get("/orders/today", async (req, res) => {
       const today = new Date();
-      const formattedToday = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
+      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
       const query = { date: formattedToday }; // Assuming the date field is named 'date'
 
       try {
@@ -560,7 +551,7 @@ async function run() {
         console.error("Error fetching orders for today:", error);
         res.status(500).json({ error: "Internal Server Error" });
       }
-    }); 
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
