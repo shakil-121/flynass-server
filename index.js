@@ -203,7 +203,7 @@ async function run() {
       // const options = { upsert: true };
       const updateProfile = {
         $set: {
-          from_address: updateInfo.from_address,
+          phone: updateInfo.phone,
           to_address: updateInfo.to_address,
           total_amount: updateInfo.total_amount,
           // amount_status:updateInfo.amount_status,
