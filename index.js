@@ -345,6 +345,7 @@ async function run() {
             { name: { $regex: text, $options: "i" } },
             { trackingId: { $regex: text, $options: "i" } },
             { user_email: { $regex: text, $options: "i" } },
+            { date: { $regex: text, $options: "i" } },
           ],
         };
       }
@@ -364,10 +365,34 @@ async function run() {
       console.log(file);
       const user_email = req.body.user_email;
       const id = req.body.marchent_id;
-      const TrackingID = req.body.trackingId;
+      // const TrackingID = req.body.trackingId;
       const fromAddress = req.body.from_address;
       const date = req.body.date;
       const status = "pending";
+     
+      // tracking id genarate==============================  
+      const currentDate = new Date();
+      const day = currentDate.getDate();
+      const month = currentDate.getMonth() + 1; // Add 1 to get the actual month (January is 0)
+      const year = currentDate.getFullYear(); 
+    
+       const previousLength = req.body.previousLength;
+       const newLength = previousLength + 1;
+       const onDigitmiddlePart = newLength.toString();
+       const fourDigitMiddle = onDigitmiddlePart.padStart(4, "0");
+       // console.log(fourDigitMiddle);
+       // const dateString = (`${day}${month}${year}` - "0001" - "FN-HF")
+       const formattedDay = String(day).padStart(2, "0");
+       const formattedMonth = String(month).padStart(2, "0");
+       const formatDate = `${formattedDay}${formattedMonth}${year}`;
+       const stringDate = formatDate.toString();
+       // console.log(`Current date: ${formattedDay}${formattedMonth}${year}`);
+       const lastDigit = "FN";
+       const TrackingID = `${stringDate}-${fourDigitMiddle}-${lastDigit}`;
+
+      // ===================================================
+
+
       if (!file) {
         return res.status(400).json({ error: "No CSV file uploaded" });
       }
