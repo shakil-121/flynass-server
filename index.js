@@ -338,8 +338,6 @@ async function run() {
       if (ObjectId.isValid(text)) {
         query = { _id: new ObjectId(text) };
       } else { 
-        const searchDate = moment(text, "DD/MM/YYYY").toDate();
-        const nextDay = moment(searchDate).add(1, "day").toDate();
         query = {
           $or: [
             { _id: { $regex: text, $options: "i" } },
@@ -347,7 +345,6 @@ async function run() {
             { name: { $regex: text, $options: "i" } },
             { trackingId: { $regex: text, $options: "i" } },
             { user_email: { $regex: text, $options: "i" } },
-            { date: { $gte: searchDate, $lt: nextDay } },
           ],
         };
       }
