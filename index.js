@@ -1,4 +1,5 @@
 const express = require("express");
+// import express from "express"
 const app = express();
 const port = process.env.PORT || 5000;
 const cors = require("cors");
@@ -94,7 +95,16 @@ async function run() {
 
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result);
-    });
+    }); 
+    
+    // single user delete API 
+    app.delete("/users/:id", async(req,res)=>{
+      const id=req.params.id;
+
+      const quary={_id:new ObjectId(id)}
+      const result=await usersCollection.deleteOne(quary);
+      res.send(result)
+    })
 
     // update user info 
     app.put("/user/update/:id", async (req, res) => {
@@ -118,17 +128,17 @@ async function run() {
     // user role update 
     app.put("/user/role_update/:id", async (req, res) => {
       const id = req.params.id;
-      const user = req.body;
-      console.log(user);
+      // const user = req.body;
+      // console.log(user);
       // const filter = { _id: new ObjectId(id) };
       const filter = { _id: new ObjectId(id) };
       // const options = { upsert: true };
-      const updateProfile = {
+      const updaterole = {
         $set: {
-          role: user.role,
+          role: "merchant",
         },
       };
-      const result = await usersCollection.updateOne(filter, updateProfile);
+      const result = await usersCollection.updateOne(filter, updaterole);
       res.send(result);
     });
 
@@ -408,7 +418,7 @@ async function run() {
   
     // delete multipul order by filtering status
     app.delete("/delete", async (req, res) => {
-      const query = { status: { $in: ["delivered", "rejected"] } };
+      const query = { status: { $in: ["delivered", "rejected","returned to merchant"] } };
     
       try {
         const result = await orderCollection.deleteMany(query);
@@ -466,7 +476,7 @@ async function run() {
 
     app.get("/orders/today", async (req, res) => {
       const today = new Date();
-      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+      const formattedToday = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
       const query = { date: formattedToday }; // Assuming the date field is named 'date'
 
       console.log("Query:", query); // Add this line for debugging
