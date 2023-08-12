@@ -215,9 +215,27 @@ async function run() {
         $set: {
           phone: updateInfo.phone,
           to_address: updateInfo.to_address,
-          total_amount: updateInfo.total_amount,
-          // amount_status:updateInfo.amount_status,
-          // status:updateInfo.status,
+        },
+      };
+      const result = await orderCollection.updateOne(filter, updateProfile);
+      res.send(result);
+    });
+
+    // update order info for admin
+    app.put("/order/admin/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateInfo = req.body;
+      console.log(updateInfo);
+      // const filter = { _id: new ObjectId(id) };
+      const filter = { _id: new ObjectId(id) };
+      // const options = { upsert: true };
+      const updateProfile = {
+        $set: {
+          from_address: updateInfo.from_address,
+          to_address: updateInfo.to_address,
+          delivary_Charge: updateInfo.delivary_Charge,
+          cod: updateInfo.cod,
+          total_amount: updateInfo.total_amount
         },
       };
       const result = await orderCollection.updateOne(filter, updateProfile);
@@ -477,7 +495,7 @@ async function run() {
             total_amount: row.total_amount,
             special_instruction: row["Special instruction"],
             user_email: user_email,
-            status: status, 
+            status: status,
             payment_status: "due",
             date: date,
             trackingId: trackingId, // Use the generated tracking ID
@@ -567,10 +585,10 @@ async function run() {
     // await client.close();
   }
 }
-run().catch(console.dir); 
+run().catch(console.dir);
 
-app.get("/health",(req,res)=>{
-  res.status(200).json({success: true});
+app.get("/health", (req, res) => {
+  res.status(200).json({ success: true });
 })
 
 app.get("/", (req, res) => {
