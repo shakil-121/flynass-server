@@ -363,6 +363,7 @@ async function run() {
             { name: { $regex: text, $options: "i" } },
             { trackingId: { $regex: text, $options: "i" } },
             { user_email: { $regex: text, $options: "i" } },
+            { status: { $regex: text, $options: "i" } },
           ],
         };
       }
@@ -494,7 +495,8 @@ async function run() {
             total_amount: row.total_amount,
             special_instruction: row["Special instruction"],
             user_email: user_email,
-            status: status,
+            status: status, 
+            payment_status: "due",
             date: date,
             trackingId: trackingId, // Use the generated tracking ID
           });
@@ -557,9 +559,11 @@ async function run() {
     });
 
     // filter by date
-    app.get("/orders/today", async (req, res) => {
+    app.get("/today", async (req, res) => {
       const today = new Date();
-      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+      console.log(today);
+      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`; 
+      console.log("Today",formattedToday);
       const query = { date: formattedToday }; // Assuming the date field is named 'date'
 
       try {
@@ -581,7 +585,11 @@ async function run() {
     // await client.close();
   }
 }
-run().catch(console.dir);
+run().catch(console.dir); 
+
+app.get("/health",(req,res)=>{
+  res.status(200).json({success: true});
+})
 
 app.get("/", (req, res) => {
   res.send("Flynass Server is Running.........");
