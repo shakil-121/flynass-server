@@ -215,9 +215,27 @@ async function run() {
         $set: {
           phone: updateInfo.phone,
           to_address: updateInfo.to_address,
-          total_amount: updateInfo.total_amount,
-          // amount_status:updateInfo.amount_status,
-          // status:updateInfo.status,
+        },
+      };
+      const result = await orderCollection.updateOne(filter, updateProfile);
+      res.send(result);
+    });
+
+    // update order info for admin
+    app.put("/order/admin/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateInfo = req.body;
+      console.log(updateInfo);
+      // const filter = { _id: new ObjectId(id) };
+      const filter = { _id: new ObjectId(id) };
+      // const options = { upsert: true };
+      const updateProfile = {
+        $set: {
+          from_address: updateInfo.phone,
+          to_address: updateInfo.to_address,
+          delivary_Charge: updateInfo.delivary_Charge,
+          cod: updateInfo.cod,
+          total_amount: updateInfo.total_amount
         },
       };
       const result = await orderCollection.updateOne(filter, updateProfile);
