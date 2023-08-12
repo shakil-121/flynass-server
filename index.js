@@ -541,8 +541,9 @@ async function run() {
     });
 
     // filter by date
-    app.get("/orders/today", async (req, res) => {
+    app.get("/today", async (req, res) => {
       const today = new Date();
+      console.log(today);
       const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`; 
       console.log("Today",formattedToday);
       const query = { date: formattedToday }; // Assuming the date field is named 'date'
