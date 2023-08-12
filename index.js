@@ -543,7 +543,8 @@ async function run() {
     // filter by date
     app.get("/orders/today", async (req, res) => {
       const today = new Date();
-      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`; 
+      console.log("Today",formattedToday);
       const query = { date: formattedToday }; // Assuming the date field is named 'date'
 
       try {
@@ -565,7 +566,11 @@ async function run() {
     // await client.close();
   }
 }
-run().catch(console.dir);
+run().catch(console.dir); 
+
+app.get("/health",(req,res)=>{
+  res.status(200).json({success: true});
+})
 
 app.get("/", (req, res) => {
   res.send("Flynass Server is Running.........");
