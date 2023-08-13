@@ -139,7 +139,12 @@ async function run() {
         $set: {
           name: user.name,
           phone: user.phone,
-          address: user.address,
+          address: user.address, 
+          account_number:user.account_number,
+          bank_name:user.bank_name,
+          branch_name:user.branch_name,
+          payment_method:user.payment_method,
+          routing_number:user.routing_number,
         },
       };
       const result = await usersCollection.updateOne(filter, updateProfile);
