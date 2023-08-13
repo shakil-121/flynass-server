@@ -61,6 +61,7 @@ async function run() {
 
     const usersCollection = client.db("flynass").collection("users");
     const orderCollection = client.db("flynass").collection("orders");
+    const noticeCollection = client.db("flynass").collection("notice");
 
     // jwt token create
     app.post("/jwt", (req, res) => {
@@ -70,6 +71,26 @@ async function run() {
       });
       res.send({ token });
     });
+    
+  //  notice update  
+  app.put("/notice/:id", async(req,res)=>{ 
+    const id=req.params.id;
+    const notice=req.body.notice;  
+    const filter={_id:new ObjectId(id)}
+    const updateNotice = {
+      $set: {
+        notice:notice,
+      },
+    };
+    const result = await noticeCollection.updateOne(filter,updateNotice);
+    res.send(result);
+
+  }) 
+  app.get("/get_notice",async(req,res)=>{
+    const result=await noticeCollection.findOne();
+    res.send(result)
+  })
+
 
     app.post("/users", async (req, res) => {
       users = req.body;
