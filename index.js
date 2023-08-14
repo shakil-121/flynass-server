@@ -71,25 +71,25 @@ async function run() {
       });
       res.send({ token });
     });
-    
-  //  notice update  
-  app.put("/notice/:id", async(req,res)=>{ 
-    const id=req.params.id;
-    const notice=req.body.notice;  
-    const filter={_id:new ObjectId(id)}
-    const updateNotice = {
-      $set: {
-        notice:notice,
-      },
-    };
-    const result = await noticeCollection.updateOne(filter,updateNotice);
-    res.send(result);
 
-  }) 
-  app.get("/get_notice",async(req,res)=>{
-    const result=await noticeCollection.findOne();
-    res.send(result)
-  })
+    //  notice update  
+    app.put("/notice/:id", async (req, res) => {
+      const id = req.params.id;
+      const notice = req.body.notice;
+      const filter = { _id: new ObjectId(id) }
+      const updateNotice = {
+        $set: {
+          notice: notice,
+        },
+      };
+      const result = await noticeCollection.updateOne(filter, updateNotice);
+      res.send(result);
+
+    })
+    app.get("/get_notice", async (req, res) => {
+      const result = await noticeCollection.findOne();
+      res.send(result)
+    })
 
 
     app.post("/users", async (req, res) => {
@@ -139,12 +139,12 @@ async function run() {
         $set: {
           name: user.name,
           phone: user.phone,
-          address: user.address, 
-          account_number:user.account_number,
-          bank_name:user.bank_name,
-          branch_name:user.branch_name,
-          payment_method:user.payment_method,
-          routing_number:user.routing_number,
+          address: user.address,
+          account_number: user.account_number,
+          bank_name: user.bank_name,
+          branch_name: user.branch_name,
+          payment_method: user.payment_method,
+          routing_number: user.routing_number,
         },
       };
       const result = await usersCollection.updateOne(filter, updateProfile);
@@ -261,7 +261,8 @@ async function run() {
           to_address: updateInfo.to_address,
           delivary_Charge: updateInfo.delivary_Charge,
           cod: updateInfo.cod,
-          total_amount: updateInfo.total_amount
+          total_amount: updateInfo.total_amount,
+          payable_amount: updateInfo.payable_amount,
         },
       };
       const result = await orderCollection.updateOne(filter, updateProfile);
@@ -588,7 +589,7 @@ async function run() {
     app.get("/today", async (req, res) => {
       const today = new Date();
       // console.log(today);
-      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`; 
+      const formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
       // console.log("Today",formattedToday);
       const query = { date: formattedToday }; // Assuming the date field is named 'date'
 
