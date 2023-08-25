@@ -144,6 +144,7 @@ async function run() {
           branch_name: user.branch_name,
           payment_method: user.payment_method,
           routing_number: user.routing_number,
+          merchant_name:user.merchant_name,
         },
       };
       const result = await usersCollection.updateOne(filter, updateProfile);
@@ -387,6 +388,7 @@ async function run() {
             { _id: { $regex: text, $options: "i" } },
             { phone: { $regex: text, $options: "i" } },
             { name: { $regex: text, $options: "i" } },
+            { merchant_name: { $regex: text, $options: "i" } },
             { trackingId: { $regex: text, $options: "i" } },
             { user_email: { $regex: text, $options: "i" } },
             { status: { $regex: text, $options: "i" } },
@@ -508,7 +510,7 @@ async function run() {
           // Adjust this according to your actual CSV structure
           results.push({
             marchent_id: id,
-            name: row["Marchent name"],
+            merchant_name: row["Marchent name"],
             customer_phone: row["Coustomer phone number"],
             customer_name: row["Customer name"],
             from_address: fromAddress,
