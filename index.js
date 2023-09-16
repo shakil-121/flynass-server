@@ -1,5 +1,4 @@
 const express = require("express");
-// import express from "express"
 const app = express();
 const port = process.env.PORT || 5000;
 const cors = require("cors");
@@ -390,6 +389,7 @@ async function run() {
             { _id: { $regex: text, $options: "i" } },
             { phone: { $regex: text, $options: "i" } },
             { name: { $regex: text, $options: "i" } },
+            { merchant_name: { $regex: text, $options: "i" } },
             { trackingId: { $regex: text, $options: "i" } },
             { user_email: { $regex: text, $options: "i" } },
             { status: { $regex: text, $options: "i" } },
@@ -511,7 +511,7 @@ async function run() {
           // Adjust this according to your actual CSV structure
           results.push({
             marchent_id: id,
-            name: row["Marchent name"],
+            merchant_name: row["Marchent name"],
             customer_phone: row["Coustomer phone number"],
             customer_name: row["Customer name"],
             from_address: fromAddress,
