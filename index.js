@@ -126,7 +126,7 @@ async function run() {
       res.send(result)
     })
 
-    // update user info 
+    // This is a user update API 
     app.put("/user/update/:id", async (req, res) => {
       const id = req.params.id;
       const user = req.body;
