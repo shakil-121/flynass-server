@@ -130,15 +130,13 @@ async function run() {
     app.put("/user/update/:id", async (req, res) => {
       const id = req.params.id;
       const user = req.body;
-      console.log(user?.account_holder);
-      // const filter = { _id: new ObjectId(id) };
+      console.log(user?.merchant_name);
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updateProfile = {
         $set: {
           name: user.name,
           phone: user.phone,
-          merchant_name: user.merchant_name,
           address: user.address,
           account_number: user.account_number,
           bank_name: user.bank_name,
@@ -146,6 +144,7 @@ async function run() {
           payment_method: user.payment_method,
           routing_number: user.routing_number,
           account_holder: user.account_holder,
+          merchant_name: user.merchant_name,
         },
       };
       const result = await usersCollection.updateOne(filter, updateProfile, options);
