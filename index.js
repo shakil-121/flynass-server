@@ -133,7 +133,7 @@ async function run() {
       console.log(user?.account_holder);
       // const filter = { _id: new ObjectId(id) };
       const filter = { _id: new ObjectId(id) };
-      // const options = { upsert: true };
+      const options = { upsert: true };
       const updateProfile = {
         $set: {
           name: user.name,
@@ -148,7 +148,7 @@ async function run() {
           account_holder: user.account_holder,
         },
       };
-      const result = await usersCollection.updateOne(filter, updateProfile);
+      const result = await usersCollection.updateOne(filter, updateProfile, options);
       res.send(result);
     });
 
