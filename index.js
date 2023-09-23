@@ -145,7 +145,6 @@ async function run() {
           routing_number: user.routing_number,
           account_holder: user.account_holder,
           merchant_name: user.merchant_name,
-          test: user.test,
         },
       };
       const result = await usersCollection.updateOne(filter, updateProfile, options);
