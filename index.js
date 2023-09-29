@@ -260,6 +260,7 @@ async function run() {
           from_address: updateInfo.from_address,
           to_address: updateInfo.to_address,
           delivary_Charge: updateInfo.delivary_Charge,
+          product_amount: updateInfo.product_amount,
           cod: updateInfo.cod,
           total_amount: updateInfo.total_amount,
           payable_amount: updateInfo.payable_amount,
