@@ -212,14 +212,14 @@ async function run() {
     // }
 
     app.get("/orders", async (req, res) => {
-      const result = await orderCollection.find().toArray();
+      const result = await orderCollection.find().sort({ date: -1 }).toArray();
       res.send(result);
     });
 
     app.get("/user/order/:email", async (req, res) => {
       const email = req.params.email;
       const quary = { user_email: email }
-      const result = await orderCollection.find(quary).toArray();
+      const result = await orderCollection.find(quary).sort({ date: -1 }).toArray();
       res.send(result)
     })
 
